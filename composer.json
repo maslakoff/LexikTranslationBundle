@@ -1,7 +1,7 @@
 {
     "name": "wmcits/translation-bundle",
     "type": "symfony-bundle",
-    "description": "This bundle allow to import translation files content into the database and provide a GUI to edit translations.",
+    "description": "This bundle allows to import translation files content into the database and provide a GUI to edit translations.",
     "keywords": ["Symfony2", "bundle", "translation", "i18n"],
     "homepage": "https://github.com/lexik/LexikTranslationBundle",
     "license": "MIT",
@@ -17,8 +17,8 @@
         }
     ],
     "require": {
-        "php": ">=5.3.2",
-        "symfony/framework-bundle": "~2.7"
+        "php": ">=5.5.9",
+        "symfony/framework-bundle": "~2.8|~3.0"
     },
     "require-dev": {
         "doctrine/orm": "~2.4,<2.5",
@@ -39,7 +39,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "3.x.x-dev"
+            "dev-master": "4.x.x-dev"
         }
     }
 }

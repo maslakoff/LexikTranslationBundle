@@ -192,11 +192,11 @@ class TransUnitManager implements TransUnitManagerInterface
      *
      * @return FileInterface|null
      */
-    protected function getTranslationFile(TransUnitInterface & $transUnit, $locale)
+    public function getTranslationFile(TransUnitInterface & $transUnit, $locale)
     {
         $file = null;
-        foreach ($transUnit->getTranslations() as $translationModel) {
-            if (null !== $file = $translationModel->getFile()) {
+        foreach ($transUnit->getTranslations() as $translation) {
+            if (null !== $file = $translation->getFile()) {
                 break;
             }
         }
@@ -209,5 +209,42 @@ class TransUnitManager implements TransUnitManagerInterface
         }
 
         return $file;
+    }
+
+    /**
+     * @param TransUnitInterface $transUnit
+     * @return bool
+     */
+    public function delete(TransUnitInterface $transUnit)
+    {
+        try {
+            $this->storage->remove($transUnit);
+            $this->storage->flush();
+
+            return true;
+
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * @param TransUnitInterface $transUnit
+     * @param string             $locale
+     * @return bool
+     */
+    public function deleteTranslation(TransUnitInterface $transUnit, $locale)
+    {
+        try {
+            $translation = $transUnit->getTranslation($locale);
+
+            $this->storage->remove($translation);
+            $this->storage->flush();
+
+            return true;
+
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }

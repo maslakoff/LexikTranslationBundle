@@ -18,6 +18,7 @@
         <parameter key="lexik_translation.exporter.php.class">Lexik\Bundle\TranslationBundle\Translation\Exporter\PhpExporter</parameter>
 
         <parameter key="lexik_translation.orm.translation_storage.class">Lexik\Bundle\TranslationBundle\Storage\DoctrineORMStorage</parameter>
+        <parameter key="lexik_translation.orm.listener.class">Lexik\Bundle\TranslationBundle\Storage\Listener\DoctrineORMListener</parameter>
         <parameter key="lexik_translation.orm.trans_unit.class">Lexik\Bundle\TranslationBundle\Entity\TransUnit</parameter>
         <parameter key="lexik_translation.orm.translation.class">Lexik\Bundle\TranslationBundle\Entity\Translation</parameter>
         <parameter key="lexik_translation.orm.file.class">Lexik\Bundle\TranslationBundle\Entity\File</parameter>
@@ -37,8 +38,6 @@
 
         <parameter key="lexik_translation.overview.stats_aggregator.class">Lexik\Bundle\TranslationBundle\Util\Overview\StatsAggregator</parameter>
 
-        <parameter key="lexik_translation.form.type.trans_unit.class">Lexik\Bundle\TranslationBundle\Form\Type\TransUnitType</parameter>
-        <parameter key="lexik_translation.form.type.translation.class">Lexik\Bundle\TranslationBundle\Form\Type\TranslationType</parameter>
         <parameter key="lexik_translation.form.handler.trans_unit.class">Lexik\Bundle\TranslationBundle\Form\Handler\TransUnitFormHandler</parameter>
 
         <parameter key="lexik_translation.listener.get_database_resources.class">Lexik\Bundle\TranslationBundle\EventDispatcher\GetDatabaseResourcesListener</parameter>
@@ -105,11 +104,12 @@
         </service>
 
         <service id="lexik_translation.exporter.json" class="%lexik_translation.exporter.json.class%">
+            <argument>%lexik_translation.exporter.json.hierarchical_format%</argument>
             <tag name="lexik_translation.exporter" alias="json" />
         </service>
 
         <service id="lexik_translation.exporter.yml" class="%lexik_translation.exporter.yml.class%">
-            <argument>%lexik_translation.use_yml_tree%</argument>
+            <argument>%lexik_translation.exporter.yml.use_tree%</argument>
             <tag name="lexik_translation.exporter" alias="yml" />
         </service>
 
@@ -125,10 +125,14 @@
 
         <service id="lexik_translation.data_grid.request_handler" class="%lexik_translation.data_grid.request_handler.class%">
             <argument type="service" id="lexik_translation.trans_unit.manager" />
+            <argument type="service" id="lexik_translation.file.manager" />
             <argument type="service" id="lexik_translation.translation_storage" />
             <argument type="service" id="lexik_translation.locale.manager" />
             <call method="setCreateMissing">
                 <argument>%lexik_translation.dev_tools.create_missing%</argument>
+            </call>
+            <call method="setDefaultFileFormat">
+                <argument>%lexik_translation.dev_tools.file_format%</argument>
             </call>
         </service>
 
@@ -139,14 +143,6 @@
         </service>
 
         <!-- Form -->
-        <service id="lexik_translation.form.type.trans_unit" class="%lexik_translation.form.type.trans_unit.class%">
-            <tag name="form.type" alias="lxk_trans_unit" />
-        </service>
-
-        <service id="lexik_translation.form.type.translation" class="%lexik_translation.form.type.translation.class%">
-            <tag name="form.type" alias="lxk_translation" />
-        </service>
-
         <service id="lexik_translation.form.handler.trans_unit" class="%lexik_translation.form.handler.trans_unit.class%">
             <argument type="service" id="lexik_translation.trans_unit.manager" />
             <argument type="service" id="lexik_translation.file.manager" />

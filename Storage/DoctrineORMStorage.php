@@ -2,6 +2,10 @@
 
 namespace Lexik\Bundle\TranslationBundle\Storage;
 
+use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\DBALException;
+use Doctrine\ORM\EntityManager;
+
 /**
  * Doctrine ORM storage class.
  *
@@ -16,16 +20,40 @@ class DoctrineORMStorage extends AbstractDoctrineStorage
      */
     public function translationsTablesExist()
     {
+        /** @var EntityManager $em */
         $em = $this->getManager();
+        $connection = $em->getConnection();
 
+        // listDatabases() is not available for SQLite
+        if ('pdo_sqlite' !== $connection->getDriver()->getName()) {
+            // init a tmp connection without dbname/path/url in case it does not exist yet
+            $params = $connection->getParams();
+            if (isset($params['master'])) {
+                $params = $params['master'];
+            }
+
+            unset($params['dbname'], $params['path'], $params['url']);
+
+            $tmpConnection = DriverManager::getConnection($params);
+            try {
+                $dbExists = in_array($connection->getDatabase(), $tmpConnection->getSchemaManager()->listDatabases());
+            } catch (DBALException $e) {
+                $dbExists = false;
+            }
+            $tmpConnection->close();
+
+            if (!$dbExists) {
+                return false;
+            }
+        }
+
+        // checks tables exist
         $tables = array(
-            $em->getClassMetadata($this->getModelClass('trans_unit'))->table['name'],
-            $em->getClassMetadata($this->getModelClass('translation'))->table['name'],
+            $em->getClassMetadata($this->getModelClass('trans_unit'))->getTableName(),
+            $em->getClassMetadata($this->getModelClass('translation'))->getTableName(),
         );
 
-        $schemaManager = $em->getConnection()->getSchemaManager();
-
-        return $schemaManager->tablesExist($tables);
+        return $connection->getSchemaManager()->tablesExist($tables);
     }
 
     /**
